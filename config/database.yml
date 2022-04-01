@@ -1,0 +1,14 @@
+default: &default
+  adapter:  postgresql
+  encoding: unicode
+  pool: 25
+  host:     <%= Rails.application.credentials.dig(:db, :host) %>
+  database: <%= Rails.application.credentials.dig(:db, :name) %>
+  username: <%= Rails.application.credentials.dig(:db, :username) %>
+  password: <%= Rails.application.credentials.dig(:db, :password) %>
+development:
+  <<: *default
+test:
+  <<: *default
+production:
+  <<: *default
