@@ -1,0 +1,45 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe Api::V1::TransfersController, type: :controller do
+  describe 'GET #create' do
+    let(:params) do
+      {
+        organization_name: 'ACME Corp',
+        organization_bic:  'OIVUSCLQXXX',
+        organization_iban: 'FR10474608000002006107XXXXX',
+        credit_transfers:  [
+          {
+            amount:            '14.5',
+            currency:          'EUR',
+            counterparty_name: 'Bip Bip',
+            counterparty_bic:  'CRLYFRPPTOU',
+            counterparty_iban: 'EE383680981021245685',
+            description:       'Wonderland/4410'
+          },
+          {
+            amount:            '61238',
+            currency:          'EUR',
+            counterparty_name: 'Wile E Coyote',
+            counterparty_bic:  'ZDRPLBQI',
+            counterparty_iban: 'DE9935420810036209081725212',
+            description:       '//TeslaMotors/Invoice/12'
+          },
+          {
+            amount:            '999',
+            currency:          'EUR',
+            counterparty_name: 'Bugs Bunny',
+            counterparty_bic:  'RNJZNTMC',
+            counterparty_iban: 'FR0010009380540930414023042',
+            description:       '2020 09 24/2020 09 25/GoldenCarrot/'
+          }
+        ]
+      }
+    end
+
+    before { get :create, params: { transfer: params } }
+
+    it { expect(response).to have_http_status(:created) }
+  end
+end

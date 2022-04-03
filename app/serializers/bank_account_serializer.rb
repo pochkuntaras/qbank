@@ -17,11 +17,6 @@
 #  index_bank_accounts_on_bic   (bic) UNIQUE
 #  index_bank_accounts_on_iban  (iban) UNIQUE
 #
-FactoryBot.define do
-  factory :bank_account do
-    organization_name { Faker::Company.name }
-    balance_cents { rand 9_999_999 }
-    iban { Faker::Bank.iban }
-    bic { Faker::Bank.swift_bic }
-  end
+class BankAccountSerializer < ActiveModel::Serializer
+  attributes :organization_name, :iban, :bic, :balance_cents
 end

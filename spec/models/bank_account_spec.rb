@@ -22,18 +22,22 @@ require 'rails_helper'
 RSpec.describe BankAccount, type: :model do
   subject { create :bank_account }
 
-  it { is_expected.to have_many(:transactions).dependent(:destroy) }
+  describe 'Associations.' do
+    it { is_expected.to have_many(:transactions).dependent(:destroy) }
+  end
 
-  it { is_expected.to validate_presence_of :balance_cents }
-  it { is_expected.to validate_presence_of :bic }
-  it { is_expected.to validate_presence_of :iban }
-  it { is_expected.to validate_presence_of :organization_name }
+  describe 'Validations.' do
+    it { is_expected.to validate_presence_of :balance_cents }
+    it { is_expected.to validate_presence_of :bic }
+    it { is_expected.to validate_presence_of :iban }
+    it { is_expected.to validate_presence_of :organization_name }
 
-  it { is_expected.to validate_numericality_of(:balance_cents).only_integer.is_greater_than(0) }
+    it { is_expected.to validate_numericality_of(:balance_cents).only_integer.is_greater_than(0) }
 
-  it { is_expected.to validate_uniqueness_of :bic }
-  it { is_expected.to validate_uniqueness_of :iban }
+    it { is_expected.to validate_uniqueness_of :bic }
+    it { is_expected.to validate_uniqueness_of :iban }
 
-  it { is_expected.to validate_length_of(:bic).is_at_least(8).is_at_most(11) }
-  it { is_expected.to validate_length_of(:iban).is_at_least(15).is_at_most(34) }
+    it { is_expected.to validate_length_of(:bic).is_at_least(8).is_at_most(11) }
+    it { is_expected.to validate_length_of(:iban).is_at_least(15).is_at_most(34) }
+  end
 end

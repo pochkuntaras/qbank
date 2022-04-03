@@ -30,7 +30,7 @@ FactoryBot.define do
     counterparty_iban { Faker::Bank.iban }
     counterparty_bic { Faker::Bank.swift_bic }
     amount_cents { rand 9999 }
-    amount_currency { rand 99999 }
+    amount_currency { rand 99_999 }
     description { Faker::Lorem.sentence }
   end
 end
