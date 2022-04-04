@@ -8,7 +8,7 @@ RSpec.describe Transfers::Creator do
            organization_name: 'ACME Corp',
            bic:               'OIVUSCLQXXX',
            iban:              'FR10474608000002006107XXXXX',
-           balance_cents:     2_000
+           balance_cents:     200_000
   end
 
   let(:first_credit_transfer) do

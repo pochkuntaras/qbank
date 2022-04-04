@@ -7,6 +7,7 @@ ruby '3.0.2'
 
 gem 'active_model_serializers'
 gem 'bootsnap', require: false
+gem 'database_cleaner'
 gem 'dry-validation'
 gem 'interactor', '~> 3.0'
 gem 'interactor-contracts'

@@ -1,8 +1,12 @@
 # frozen_string_literal: true
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+
+include FactoryBot::Syntax::Methods
+
+DatabaseCleaner.strategy = :truncation, { except: %w[public.schema_migrations] }
+DatabaseCleaner.clean
+
+create :bank_account,
+       organization_name: 'ACME Corp',
+       bic:               'OIVUSCLQXXX',
+       iban:              'FR10474608000002006107XXXXX',
+       balance_cents:     100_000
