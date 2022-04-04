@@ -2,72 +2,61 @@
 
 module Transfers
   class Validator
-    EURO_FORMAT = /\A\d+\.\d{,2}\z/
-    CENT_FORMAT = /\A\d+\z/
-
     include Interactor
     include Interactor::Contracts
 
     expects do
-      required(:params).filled
+      required(:preparer).value(type?: ::Transfers::Preparer).filled
+    end
+
+    promises do
+      required(:message)
+      required(:status)
+
+      optional(:errors)
     end
 
     def call
-      validate_request!
+      validate_syntax!
+      validate_bank_account!
+      validate_balance!
+
+      context.message = 'Request is prepared for processing'
+      context.status  = :processing
     end
 
     private
 
-    %i[organization_bic organization_iban credit_transfers].each do |field_name|
-      define_method(field_name) do
-        request[field_name]
-      end
-    end
-
-    def transfer
-      @transfer ||= ::Transfers::Request.new
-    end
-
     def request
-      @request ||= transfer.call(context.params)
+      @request ||= ::Transfers::Request.new.call(context.params)
     end
 
-    def validate_syntax!
-      return if request.success?
+    def validate_bank_account!
+      return if context.preparer.bank_account.present?
 
       context.fail!(
-        message: 'The transfer request is invalid',
-        errors:  request.errors.to_h
+        message: 'Bank account was not found',
+        status:  :not_found
       )
     end
 
-    def validate_request!
-      validate_syntax!
-      validate_funds!
+    def validate_syntax!
+      return if context.preparer.request_valid?
+
+      context.fail!(
+        message: 'The transfer request is invalid',
+        errors:  context.preparer.request.errors.to_h,
+        status:  :bad_request
+      )
     end
 
-    def bank_account
-      @bank_account ||= ::BankAccount
-                        .where(bic: organization_bic)
-                        .or(::BankAccount.where(iban: organization_iban))
-                        .take
-    end
+    def validate_balance!
+      return if context.preparer.bank_account_balance > context.preparer.amount_cents
 
-    def sum_transfer_euro
-      return 0 if credit_transfers.blank?
-
-      credit_transfers.map do |transfer|
-        return (transfer[:amount].to_f * 100).round if transfer[:amount] =~ EURO_FORMAT
-        return transfer[:amount].to_i if transfer[:amount] =~ CENT_FORMAT
-
-        0
-      end.sum
-    end
-
-    def validate_funds!
-      return if bank_account&.balance_cents.to_i > sum_transfer_euro
-
-      context.fail!(message: 'The account has not funds for transfer')
+      context.fail!(
+        message: 'The account has not funds for transfer',
+        status:  :unprocessable_entity
+      )
     end
   end
 end
